@@ -16,20 +16,21 @@
 
 package com.google.common.collect;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkPositionIndex;
-import static com.google.common.collect.CollectPreconditions.checkEntryNotNull;
-import static com.google.common.collect.ImmutableMapEntry.createEntryArray;
-
 import com.google.common.annotations.GwtCompatible;
 import com.google.common.annotations.GwtIncompatible;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMapEntry.NonTerminalImmutableMapEntry;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.j2objc.annotations.Weak;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import java.io.Serializable;
 import java.util.function.BiConsumer;
-import org.checkerframework.checker.nullness.qual.Nullable;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkPositionIndex;
+import static com.google.common.collect.CollectPreconditions.checkEntryNotNull;
+import static com.google.common.collect.ImmutableMapEntry.createEntryArray;
 
 /**
  * Implementation of {@link ImmutableMap} with two or more entries.
@@ -262,14 +263,27 @@ final class RegularImmutableMap<K, V> extends ImmutableMap<K, V> {
     return new Values<>(this);
   }
 
-  @GwtCompatible(emulated = true)
+  /**
+   * 不可变集合Map 获取值的列表数据信息
+   * @param <K>
+   * @param <V>
+   */
   private static final class Values<K, V> extends ImmutableList<V> {
-    @Weak final RegularImmutableMap<K, V> map;
+    /**
+     * 从这个Map的数据中得到List哦
+     */
+    @Weak
+    final RegularImmutableMap<K, V> map;
 
     Values(RegularImmutableMap<K, V> map) {
       this.map = map;
     }
 
+    /**
+     * 得到下标的具体的数据
+     * @param index
+     * @return
+     */
     @Override
     public V get(int index) {
       return map.entries[index].getValue();
@@ -285,13 +299,15 @@ final class RegularImmutableMap<K, V> extends ImmutableMap<K, V> {
       return true;
     }
 
-    @GwtIncompatible // serialization
     @Override
     Object writeReplace() {
       return new SerializedForm<V>(map);
     }
 
-    @GwtIncompatible // serialization
+    /**
+     * 序列化的处理
+     * @param <V>
+     */
     private static class SerializedForm<V> implements Serializable {
       final ImmutableMap<?, V> map;
 
@@ -307,7 +323,8 @@ final class RegularImmutableMap<K, V> extends ImmutableMap<K, V> {
     }
   }
 
-  // This class is never actually serialized directly, but we have to make the
-  // warning go away (and suppressing would suppress for all nested classes too)
+  /**
+   * 这个类从来没有直接序列化，但是我们必须消除//警告（对于所有嵌套类，抑制也会禁止
+   */
   private static final long serialVersionUID = 0;
 }

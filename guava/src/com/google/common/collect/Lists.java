@@ -16,15 +16,6 @@
 
 package com.google.common.collect;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkElementIndex;
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkPositionIndex;
-import static com.google.common.base.Preconditions.checkPositionIndexes;
-import static com.google.common.base.Preconditions.checkState;
-import static com.google.common.collect.CollectPreconditions.checkNonnegative;
-import static com.google.common.collect.CollectPreconditions.checkRemove;
-
 import com.google.common.annotations.Beta;
 import com.google.common.annotations.GwtCompatible;
 import com.google.common.annotations.GwtIncompatible;
@@ -34,23 +25,17 @@ import com.google.common.base.Objects;
 import com.google.common.math.IntMath;
 import com.google.common.primitives.Ints;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import java.io.Serializable;
 import java.math.RoundingMode;
-import java.util.AbstractList;
-import java.util.AbstractSequentialList;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.NoSuchElementException;
-import java.util.RandomAccess;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Predicate;
-import org.checkerframework.checker.nullness.qual.Nullable;
+
+import static com.google.common.base.Preconditions.*;
+import static com.google.common.collect.CollectPreconditions.checkNonnegative;
+import static com.google.common.collect.CollectPreconditions.checkRemove;
 
 /**
  * Static utility methods pertaining to {@link List} instances. Also see this class's counterparts
@@ -722,9 +707,15 @@ public final class Lists {
     return new CharSequenceAsList(checkNotNull(sequence));
   }
 
-  @SuppressWarnings("serial") // serialized using ImmutableList serialization
+  /**
+   * 不可变的字符串！只能获取到字符串，不能对于字符串进行修改
+   */
+  @SuppressWarnings("serial")
   private static final class StringAsImmutableList extends ImmutableList<Character> {
 
+    /**
+     * 被保护的字符串数据
+     */
     private final String string;
 
     StringAsImmutableList(String string) {
@@ -743,7 +734,8 @@ public final class Lists {
 
     @Override
     public ImmutableList<Character> subList(int fromIndex, int toIndex) {
-      checkPositionIndexes(fromIndex, toIndex, size()); // for GWT
+      //不要超标的检测
+      checkPositionIndexes(fromIndex, toIndex, size());
       return charactersOf(string.substring(fromIndex, toIndex));
     }
 
@@ -754,7 +746,8 @@ public final class Lists {
 
     @Override
     public Character get(int index) {
-      checkElementIndex(index, size()); // for GWT
+      //检测元素的超标
+      checkElementIndex(index, size());
       return string.charAt(index);
     }
 
@@ -1000,8 +993,13 @@ public final class Lists {
     return changed;
   }
 
-  /** An implementation of {@link List#indexOf(Object)}. */
+  /**
+   * 得到元素的index的位置哦
+   * An implementation of {@link List#indexOf(Object)}.
+   *
+   */
   static int indexOfImpl(List<?> list, @Nullable Object element) {
+    //随机存取
     if (list instanceof RandomAccess) {
       return indexOfRandomAccess(list, element);
     } else {
@@ -1015,6 +1013,12 @@ public final class Lists {
     }
   }
 
+  /**
+   * 这样随机存取的速度比 迭代器更快哦~哈哈，具体看RandomAccess这个接口的说明文件！
+   * @param list
+   * @param element
+   * @return
+   */
   private static int indexOfRandomAccess(List<?> list, @Nullable Object element) {
     int size = list.size();
     if (element == null) {

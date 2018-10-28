@@ -16,10 +16,6 @@
 
 package com.google.common.collect;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.collect.CollectPreconditions.checkRemove;
-
 import com.google.common.annotations.Beta;
 import com.google.common.annotations.GwtCompatible;
 import com.google.common.annotations.GwtIncompatible;
@@ -28,18 +24,15 @@ import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Queue;
-import java.util.RandomAccess;
-import java.util.Set;
-import java.util.Spliterator;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
-import org.checkerframework.checker.nullness.qual.Nullable;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.collect.CollectPreconditions.checkRemove;
 
 /**
  * An assortment of mainly legacy static utility methods that operate on or return objects of type
@@ -280,6 +273,13 @@ public final class Iterables {
     return toArray(iterable, ObjectArrays.newArray(type, 0));
   }
 
+  /**
+   * 将可迭代的元素转换为数组
+   * @param iterable
+   * @param array
+   * @param <T>
+   * @return
+   */
   static <T> T[] toArray(Iterable<? extends T> iterable, T[] array) {
     Collection<? extends T> collection = castOrCopyToCollection(iterable);
     return collection.toArray(array);
@@ -296,9 +296,7 @@ public final class Iterables {
   }
 
   /**
-   * Converts an iterable into a collection. If the iterable is already a collection, it is
-   * returned. Otherwise, an {@link java.util.ArrayList} is created with the contents of the
-   * iterable in the same iteration order.
+   * 将一个迭代转换为集合。如果迭代已经是一个集合，则返回。否则ArrayList将以相同迭代顺序的迭代内容创建。
    */
   private static <E> Collection<E> castOrCopyToCollection(Iterable<E> iterable) {
     return (iterable instanceof Collection)

@@ -130,7 +130,7 @@ public final class Preconditions {
   }
 
   /**
-   * Ensures the truth of an expression involving one or more parameters to the calling method.
+   * 确保涉及调用方法的一个或多个参数的表达式的真实性。然后抛出这个异常哦
    *
    * @param expression a boolean expression
    * @param errorMessage the exception message to use if the check fails; will be converted to a
@@ -1272,36 +1272,10 @@ public final class Preconditions {
     return obj;
   }
 
-  /*
-   * All recent hotspots (as of 2009) *really* like to have the natural code
-   *
-   * if (guardExpression) {
-   *    throw new BadException(messageExpression);
-   * }
-   *
-   * refactored so that messageExpression is moved to a separate String-returning method.
-   *
-   * if (guardExpression) {
-   *    throw new BadException(badMsg(...));
-   * }
-   *
-   * The alternative natural refactorings into void or Exception-returning methods are much slower.
-   * This is a big deal - we're talking factors of 2-8 in microbenchmarks, not just 10-20%. (This is
-   * a hotspot optimizer bug, which should be fixed, but that's a separate, big project).
-   *
-   * The coding pattern above is heavily used in java.util, e.g. in ArrayList. There is a
-   * RangeCheckMicroBenchmark in the JDK that was used to test this.
-   *
-   * But the methods in this class want to throw different exceptions, depending on the args, so it
-   * appears that this pattern is not directly applicable. But we can use the ridiculous, devious
-   * trick of throwing an exception in the middle of the construction of another exception. Hotspot
-   * is fine with that.
-   */
 
   /**
-   * Ensures that {@code index} specifies a valid <i>element</i> in an array, list or string of size
-   * {@code size}. An element index may range from zero, inclusive, to {@code size}, exclusive.
    *
+   * 检测元素是否正常哦
    * @param index a user-supplied index identifying an element of an array, list or string
    * @param size the size of that array, list or string
    * @return the value of {@code index}

@@ -16,20 +16,22 @@
 
 package com.google.common.collect;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.google.common.annotations.GwtCompatible;
 import com.google.common.base.Preconditions;
+
 import java.util.Collections;
 import java.util.Spliterator;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
+ * 只有一个元素的不可变List！这种通过子类实现的！其实并没有对于外部进行暴露这个类的实现哦
  * Implementation of {@link ImmutableList} with exactly one element.
  *
  * @author Hayward Chan
  */
 @GwtCompatible(serializable = true, emulated = true)
-@SuppressWarnings("serial") // uses writeReplace(), not default serialization
+@SuppressWarnings("serial")
 final class SingletonImmutableList<E> extends ImmutableList<E> {
 
   final transient E element;
@@ -40,12 +42,14 @@ final class SingletonImmutableList<E> extends ImmutableList<E> {
 
   @Override
   public E get(int index) {
+    //检测index是否使用超标哦
     Preconditions.checkElementIndex(index, 1);
     return element;
   }
 
   @Override
   public UnmodifiableIterator<E> iterator() {
+    //只有一个元素的迭代器
     return Iterators.singletonIterator(element);
   }
 

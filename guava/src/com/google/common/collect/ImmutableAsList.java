@@ -18,13 +18,14 @@ package com.google.common.collect;
 
 import com.google.common.annotations.GwtCompatible;
 import com.google.common.annotations.GwtIncompatible;
+
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
 
 /**
- * List returned by {@link ImmutableCollection#asList} that delegates {@code contains} checks to the
- * backing collection.
+ * 感觉这个类什么都没干！这个不是public的只能当前包使用哦
+ * {@link ImmutableCollection#asList}中返回的数据的值，委托检测这个后备的集合的数据的信息
  *
  * @author Jared Levy
  * @author Louis Wasserman
@@ -32,54 +33,62 @@ import java.io.Serializable;
 @GwtCompatible(serializable = true, emulated = true)
 @SuppressWarnings("serial")
 abstract class ImmutableAsList<E> extends ImmutableList<E> {
-  abstract ImmutableCollection<E> delegateCollection();
+    /**
+     * 需要进行代理处理的不可变集合的数据的信息
+     *
+     * @return
+     */
+    abstract ImmutableCollection<E> delegateCollection();
 
-  @Override
-  public boolean contains(Object target) {
-    // The collection's contains() is at least as fast as ImmutableList's
-    // and is often faster.
-    return delegateCollection().contains(target);
-  }
-
-  @Override
-  public int size() {
-    return delegateCollection().size();
-  }
-
-  @Override
-  public boolean isEmpty() {
-    return delegateCollection().isEmpty();
-  }
-
-  @Override
-  boolean isPartialView() {
-    return delegateCollection().isPartialView();
-  }
-
-  /** Serialized form that leads to the same performance as the original list. */
-  @GwtIncompatible // serialization
-  static class SerializedForm implements Serializable {
-    final ImmutableCollection<?> collection;
-
-    SerializedForm(ImmutableCollection<?> collection) {
-      this.collection = collection;
+    @Override
+    public boolean contains(Object target) {
+        return delegateCollection().contains(target);
     }
 
-    Object readResolve() {
-      return collection.asList();
+    @Override
+    public int size() {
+        return delegateCollection().size();
     }
 
-    private static final long serialVersionUID = 0;
-  }
+    @Override
+    public boolean isEmpty() {
+        return delegateCollection().isEmpty();
+    }
 
-  @GwtIncompatible // serialization
-  private void readObject(ObjectInputStream stream) throws InvalidObjectException {
-    throw new InvalidObjectException("Use SerializedForm");
-  }
+    @Override
+    boolean isPartialView() {
+        return delegateCollection().isPartialView();
+    }
 
-  @GwtIncompatible // serialization
-  @Override
-  Object writeReplace() {
-    return new SerializedForm(delegateCollection());
-  }
+    /**
+     * 序列化形式，导致与原始列表相同的性能
+     */
+    @GwtIncompatible
+    static class SerializedForm implements Serializable {
+        /**
+         * 元素的引用
+         */
+        final ImmutableCollection<?> collection;
+
+        SerializedForm(ImmutableCollection<?> collection) {
+            this.collection = collection;
+        }
+
+        Object readResolve() {
+            return collection.asList();
+        }
+
+        private static final long serialVersionUID = 0;
+    }
+
+    @GwtIncompatible
+    private void readObject(ObjectInputStream stream) throws InvalidObjectException {
+        throw new InvalidObjectException("Use SerializedForm");
+    }
+
+    @GwtIncompatible
+    @Override
+    Object writeReplace() {
+        return new SerializedForm(delegateCollection());
+    }
 }

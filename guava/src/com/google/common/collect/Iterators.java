@@ -16,36 +16,21 @@
 
 package com.google.common.collect;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
-import static com.google.common.base.Predicates.instanceOf;
-import static com.google.common.collect.CollectPreconditions.checkRemove;
-
 import com.google.common.annotations.Beta;
 import com.google.common.annotations.GwtCompatible;
 import com.google.common.annotations.GwtIncompatible;
-import com.google.common.base.Function;
+import com.google.common.base.*;
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
-import com.google.common.base.Preconditions;
-import com.google.common.base.Predicate;
 import com.google.common.primitives.Ints;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import java.util.ArrayDeque;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Deque;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.NoSuchElementException;
-import java.util.PriorityQueue;
-import java.util.Queue;
 import org.checkerframework.checker.nullness.qual.Nullable;
+
+import java.util.*;
+
+import static com.google.common.base.Preconditions.*;
+import static com.google.common.base.Predicates.instanceOf;
+import static com.google.common.collect.CollectPreconditions.checkRemove;
 
 /**
  * This class contains static utility methods that operate on or return objects of type {@link
@@ -1004,18 +989,16 @@ public final class Iterators {
   }
 
   /**
-   * Returns a list iterator containing the elements in the specified range of {@code array} in
-   * order, starting at the specified index.
+   * 返回一个列表迭代器
    *
-   * <p>The {@code Iterable} equivalent of this method is {@code
-   * Arrays.asList(array).subList(offset, offset + length).listIterator(index)}.
+   * <p>The {@code Iterable} equivalent of this method is {@code Arrays.asList(array).subList(offset, offset +
+   * length).listIterator(index)}.
    */
   static <T> UnmodifiableListIterator<T> forArray(
       final T[] array, final int offset, int length, int index) {
     checkArgument(length >= 0);
     int end = offset + length;
-
-    // Technically we should give a slightly more descriptive error on overflow
+    //数据的安全性检测
     Preconditions.checkPositionIndexes(offset, end, array.length);
     Preconditions.checkPositionIndex(index, length);
     if (length == 0) {
@@ -1024,18 +1007,43 @@ public final class Iterators {
     return new ArrayItr<T>(array, offset, length, index);
   }
 
+  /**
+   * 一个数组迭代器的处理
+   * @param <T>
+   */
   private static final class ArrayItr<T> extends AbstractIndexedListIterator<T> {
+    /**
+     * 空迭代器的实现哦
+     */
     static final UnmodifiableListIterator<Object> EMPTY = new ArrayItr<>(new Object[0], 0, 0, 0);
 
+    /**
+     * 需要进行迭代的数组的信息
+     */
     private final T[] array;
+    /**
+     * 数据偏移量
+     */
     private final int offset;
 
+    /**
+     * 构造哦
+     * @param array  数据
+     * @param offset 偏移量
+     * @param length  数据长度
+     * @param index  当前获取数据是第几个哦
+     */
     ArrayItr(T[] array, int offset, int length, int index) {
       super(length, index);
       this.array = array;
       this.offset = offset;
     }
 
+    /**
+     * 获取对应的第几个的数据
+     * @param index
+     * @return
+     */
     @Override
     protected T get(int index) {
       return array[offset + index];
@@ -1043,7 +1051,7 @@ public final class Iterators {
   }
 
   /**
-   * Returns an iterator containing only {@code value}.
+   * 只有一个元素的迭代器的支持哦
    *
    * <p>The {@link Iterable} equivalent of this method is {@link Collections#singleton}.
    */
