@@ -14,11 +14,11 @@
 
 package com.google.common.base;
 
-import static com.google.common.base.Strings.lenientFormat;
-
 import com.google.common.annotations.GwtCompatible;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import org.checkerframework.checker.nullness.qual.Nullable;
+
+import static com.google.common.base.Strings.lenientFormat;
 
 /**
  * Static convenience methods that help a method or constructor check whether it was invoked
@@ -111,6 +111,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  *
  * @author Kevin Bourrillion
  * @since 2.0
+ * 先决条件
  */
 @GwtCompatible
 public final class Preconditions {
@@ -864,6 +865,7 @@ public final class Preconditions {
   }
 
   /**
+   * 确保对象引用作为参数传递给调用方法，而不是NULL
    * Ensures that an object reference passed as a parameter to the calling method is not null.
    *
    * @param reference an object reference

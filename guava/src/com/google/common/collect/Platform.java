@@ -17,6 +17,7 @@
 package com.google.common.collect;
 
 import com.google.common.annotations.GwtCompatible;
+
 import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Map;
@@ -87,7 +88,16 @@ final class Platform {
     return result;
   }
 
-  /** Equivalent to Arrays.copyOfRange(source, from, to, arrayOfType.getClass()). */
+  /**
+   * 封装JDK中的方法  Arrays.copyOfRange(source, from, to, (Class<? extends T[]>) arrayOfType.getClass());
+   * 进行部分复制处理
+   * @param source
+   * @param from
+   * @param to
+   * @param arrayOfType
+   * @param <T>
+   * @return
+   */
   static <T> T[] copy(Object[] source, int from, int to, T[] arrayOfType) {
     return Arrays.copyOfRange(source, from, to, (Class<? extends T[]>) arrayOfType.getClass());
   }
