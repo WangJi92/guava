@@ -16,64 +16,82 @@
 
 package com.google.common.collect;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.google.common.annotations.GwtCompatible;
 import com.google.common.annotations.GwtIncompatible;
+
 import java.util.Spliterator;
 import java.util.function.Consumer;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+/**
+ * indexed （索引）标识可以遍历的处理？
+ *
+ * @param <E>
+ */
 @GwtCompatible(emulated = true)
 abstract class IndexedImmutableSet<E> extends ImmutableSet<E> {
-  abstract E get(int index);
+    /**
+     * forEach遍历的时候，通过index 下标进行遍历set 集合数组中的元素的信息，这里主要是通过遍历数组（List）中元素 详情可以参考 ImmutableSet内部的实现！处理方式比较的妥当
+     *
+     * @param index
+     * @return
+     */
+    abstract E get(int index);
 
-  @Override
-  public UnmodifiableIterator<E> iterator() {
-    return asList().iterator();
-  }
-
-  @Override
-  public Spliterator<E> spliterator() {
-    return CollectSpliterators.indexed(size(), SPLITERATOR_CHARACTERISTICS, this::get);
-  }
-
-  @Override
-  public void forEach(Consumer<? super E> consumer) {
-    checkNotNull(consumer);
-    int n = size();
-    for (int i = 0; i < n; i++) {
-      consumer.accept(get(i));
+    @Override
+    public UnmodifiableIterator<E> iterator() {
+        //根据获取的数组信息进行获取迭代器进行遍历
+        return asList().iterator();
     }
-  }
 
-  @Override
-  @GwtIncompatible
-  int copyIntoArray(Object[] dst, int offset) {
-    return asList().copyIntoArray(dst, offset);
-  }
+    @Override
+    public Spliterator<E> spliterator() {
+        return CollectSpliterators.indexed(size(), SPLITERATOR_CHARACTERISTICS, this::get);
+    }
 
-  @Override
-  ImmutableList<E> createAsList() {
-    return new ImmutableAsList<E>() {
-      @Override
-      public E get(int index) {
-        return IndexedImmutableSet.this.get(index);
-      }
+    @Override
+    public void forEach(Consumer<? super E> consumer) {
+        checkNotNull(consumer);
+        int n = size();
+        for (int i = 0; i < n; i++) {
+            //这里是根据数组中的下标来遍历Set集合中的，可能有自己的考虑，牺牲空间换取时间
+            consumer.accept(get(i));
+        }
+    }
 
-      @Override
-      boolean isPartialView() {
-        return IndexedImmutableSet.this.isPartialView();
-      }
+    @Override
+    @GwtIncompatible
+    int copyIntoArray(Object[] dst, int offset) {
+        //复制数据的信息
+        return asList().copyIntoArray(dst, offset);
+    }
 
-      @Override
-      public int size() {
-        return IndexedImmutableSet.this.size();
-      }
+    @Override
+    ImmutableList<E> createAsList() {
+        /**
+         * 获取List集合中的数据信息，简单的作为一个代理
+         */
+        return new ImmutableAsList<E>() {
+            @Override
+            public E get(int index) {
+                return IndexedImmutableSet.this.get(index);
+            }
 
-      @Override
-      ImmutableCollection<E> delegateCollection() {
-        return IndexedImmutableSet.this;
-      }
-    };
-  }
+            @Override
+            boolean isPartialView() {
+                return IndexedImmutableSet.this.isPartialView();
+            }
+
+            @Override
+            public int size() {
+                return IndexedImmutableSet.this.size();
+            }
+
+            @Override
+            ImmutableCollection<E> delegateCollection() {
+                return IndexedImmutableSet.this;
+            }
+        };
+    }
 }

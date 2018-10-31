@@ -106,15 +106,22 @@ public final class Iterators {
     return (Iterator<T>) EmptyModifiableIterator.INSTANCE;
   }
 
-  /** Returns an unmodifiable view of {@code iterator}. */
+    /**
+     * Returns an unmodifiable view of {@code iterator} 返回不可变的迭代数据处理 这样就可以直接的使用JDK中的数据做代理啦！即使通过迭代器遍历也是安全可靠的
+     *
+     * @param iterator
+     * @param <T>
+     * @return
+     */
   public static <T> UnmodifiableIterator<T> unmodifiableIterator(
       final Iterator<? extends T> iterator) {
     checkNotNull(iterator);
     if (iterator instanceof UnmodifiableIterator) {
-      @SuppressWarnings("unchecked") // Since it's unmodifiable, the covariant cast is safe
+        @SuppressWarnings("unchecked")
       UnmodifiableIterator<T> result = (UnmodifiableIterator<T>) iterator;
       return result;
     }
+      //下面的步骤就是JDK迭代器产生的啦！
     return new UnmodifiableIterator<T>() {
       @Override
       public boolean hasNext() {

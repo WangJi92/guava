@@ -18,73 +18,82 @@ package com.google.common.collect;
 
 import com.google.common.annotations.GwtCompatible;
 import com.google.common.annotations.GwtIncompatible;
+
 import java.util.function.Consumer;
 
 /**
- * An {@link ImmutableAsList} implementation specialized for when the delegate collection is already
- * backed by an {@code ImmutableList} or array.
+ * {@link ImmutableAsList}实现，专门用于委托集合已由{@code ImmutableList}或数组支持
+ * <p>
+ * Regular  如何理解这个单词 adj. 有规律的;规则，整齐的;不变的;合格的 n.正规军;主力（或正式）队员;常客 adv. 定期地;经常地
  *
  * @author Louis Wasserman
  */
 @GwtCompatible(emulated = true)
-@SuppressWarnings("serial") // uses writeReplace, not default serialization
+@SuppressWarnings("serial")
 class RegularImmutableAsList<E> extends ImmutableAsList<E> {
-  private final ImmutableCollection<E> delegate;
-  private final ImmutableList<? extends E> delegateList;
+    /**
+     * 这个是代理的集合 比如Set 里面的HashTable的数据可能不方便变量查看！
+     */
+    private final ImmutableCollection<E> delegate;
 
-  RegularImmutableAsList(ImmutableCollection<E> delegate, ImmutableList<? extends E> delegateList) {
-    this.delegate = delegate;
-    this.delegateList = delegateList;
-  }
+    /**
+     * 这个就是保存了当前集合中的数据的信息！方便遍历和查看List中的数据信息
+     */
+    private final ImmutableList<? extends E> delegateList;
 
-  RegularImmutableAsList(ImmutableCollection<E> delegate, Object[] array) {
-    this(delegate, ImmutableList.<E>asImmutableList(array));
-  }
+    RegularImmutableAsList(ImmutableCollection<E> delegate, ImmutableList<? extends E> delegateList) {
+        this.delegate = delegate;
+        this.delegateList = delegateList;
+    }
 
-  @Override
-  ImmutableCollection<E> delegateCollection() {
-    return delegate;
-  }
+    RegularImmutableAsList(ImmutableCollection<E> delegate, Object[] array) {
+        this(delegate, ImmutableList.<E>asImmutableList(array));
+    }
 
-  ImmutableList<? extends E> delegateList() {
-    return delegateList;
-  }
+    @Override
+    ImmutableCollection<E> delegateCollection() {
+        return delegate;
+    }
 
-  @SuppressWarnings("unchecked") // safe covariant cast!
-  @Override
-  public UnmodifiableListIterator<E> listIterator(int index) {
-    return (UnmodifiableListIterator<E>) delegateList.listIterator(index);
-  }
+    ImmutableList<? extends E> delegateList() {
+        return delegateList;
+    }
 
-  @GwtIncompatible // not present in emulated superclass
-  @Override
-  public void forEach(Consumer<? super E> action) {
-    delegateList.forEach(action);
-  }
+    @SuppressWarnings("unchecked")
+    @Override
+    public UnmodifiableListIterator<E> listIterator(int index) {
+        return (UnmodifiableListIterator<E>)delegateList.listIterator(index);
+    }
 
-  @GwtIncompatible // not present in emulated superclass
-  @Override
-  int copyIntoArray(Object[] dst, int offset) {
-    return delegateList.copyIntoArray(dst, offset);
-  }
+    @GwtIncompatible
+    @Override
+    public void forEach(Consumer<? super E> action) {
+        delegateList.forEach(action);
+    }
 
-  @Override
-  Object[] internalArray() {
-    return delegateList.internalArray();
-  }
+    @GwtIncompatible
+    @Override
+    int copyIntoArray(Object[] dst, int offset) {
+        return delegateList.copyIntoArray(dst, offset);
+    }
 
-  @Override
-  int internalArrayStart() {
-    return delegateList.internalArrayStart();
-  }
+    @Override
+    Object[] internalArray() {
+        return delegateList.internalArray();
+    }
 
-  @Override
-  int internalArrayEnd() {
-    return delegateList.internalArrayEnd();
-  }
+    @Override
+    int internalArrayStart() {
+        return delegateList.internalArrayStart();
+    }
 
-  @Override
-  public E get(int index) {
-    return delegateList.get(index);
-  }
+    @Override
+    int internalArrayEnd() {
+        return delegateList.internalArrayEnd();
+    }
+
+    @Override
+    public E get(int index) {
+        return delegateList.get(index);
+    }
 }

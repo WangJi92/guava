@@ -18,6 +18,7 @@ package com.google.common.collect;
 
 import com.google.common.annotations.GwtCompatible;
 import com.google.errorprone.annotations.concurrent.LazyInit;
+
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.EnumSet;
@@ -25,14 +26,15 @@ import java.util.Spliterator;
 import java.util.function.Consumer;
 
 /**
+ * 这个是一种特殊的Set，限定了泛型的类型而已！必须是枚举的哦！其他的感觉和父类没有什么不一样的！
  * Implementation of {@link ImmutableSet} backed by a non-empty {@link java.util.EnumSet}.
  *
  * @author Jared Levy
  */
 @GwtCompatible(serializable = true, emulated = true)
-@SuppressWarnings("serial") // we're overriding default serialization
+@SuppressWarnings("serial")
 final class ImmutableEnumSet<E extends Enum<E>> extends ImmutableSet<E> {
-  @SuppressWarnings("rawtypes") // necessary to compile against Java 8
+    @SuppressWarnings("rawtypes")
   static ImmutableSet asImmutable(EnumSet set) {
     switch (set.size()) {
       case 0:
@@ -40,6 +42,7 @@ final class ImmutableEnumSet<E extends Enum<E>> extends ImmutableSet<E> {
       case 1:
         return ImmutableSet.of(Iterables.getOnlyElement(set));
       default:
+          //直接通过代理去处理数据的不可变性的！
         return new ImmutableEnumSet(set);
     }
   }
@@ -47,10 +50,10 @@ final class ImmutableEnumSet<E extends Enum<E>> extends ImmutableSet<E> {
   /*
    * Notes on EnumSet and <E extends Enum<E>>:
    *
-   * This class isn't an arbitrary ForwardingImmutableSet because we need to
-   * know that calling {@code clone()} during deserialization will return an
-   * object that no one else has a reference to, allowing us to guarantee
-   * immutability. Hence, we support only {@link EnumSet}.
+   * 此类不是任意的ForwardingImmutableSet，因为我们需要知道在反序列化期间调用{@code clone（）}将返回一个其他人没有引用的对象，
+   * 从而允许我们保证不变性。因此，我们仅支持{@link EnumSet}
+   *
+   * 这个就是一个数据的存储哦！通过复制了一个集合中的数据信息！保证数据的不可变性
    */
   private final transient EnumSet<E> delegate;
 
@@ -65,6 +68,7 @@ final class ImmutableEnumSet<E extends Enum<E>> extends ImmutableSet<E> {
 
   @Override
   public UnmodifiableIterator<E> iterator() {
+      //直接使用JDK的迭代器也是处理掉！通过代理进行禁止掉！
     return Iterators.unmodifiableIterator(delegate.iterator());
   }
 
@@ -117,7 +121,11 @@ final class ImmutableEnumSet<E extends Enum<E>> extends ImmutableSet<E> {
     return true;
   }
 
-  @LazyInit private transient int hashCode;
+    /**
+     * 当前集合数据的hashcode总和是多少！
+     */
+    @LazyInit
+    private transient int hashCode;
 
   @Override
   public int hashCode() {
@@ -130,13 +138,17 @@ final class ImmutableEnumSet<E extends Enum<E>> extends ImmutableSet<E> {
     return delegate.toString();
   }
 
-  // All callers of the constructor are restricted to <E extends Enum<E>>.
+    /**
+     * Returns an unmodifiable view of {@code iterator}
+     * @return
+     */
   @Override
   Object writeReplace() {
     return new EnumSerializedForm<E>(delegate);
   }
 
-  /*
+    /**
+     * 此类用于序列化ImmutableEnumSet实例
    * This class is used to serialize ImmutableEnumSet instances.
    */
   private static class EnumSerializedForm<E extends Enum<E>> implements Serializable {
@@ -147,7 +159,9 @@ final class ImmutableEnumSet<E extends Enum<E>> extends ImmutableSet<E> {
     }
 
     Object readResolve() {
-      // EJ2 #76: Write readObject() methods defensively.
+        /**
+         * 防御性地编写readObject（）方法
+         */
       return new ImmutableEnumSet<E>(delegate.clone());
     }
 
